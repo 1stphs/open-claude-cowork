@@ -145,7 +145,7 @@ COMPOSIO_API_KEY=your-composio-api-key
 
 ### Starting the Application
 
-You need **two terminal windows**:
+You need **three terminal windows**:
 
 **Terminal 1 - Backend Server:**
 ```bash
@@ -158,6 +158,11 @@ npm start
 npm start
 ```
 
+**Terminal 3 - MarkitDown MCP**
+```bash
+uv sync
+uv run markitdown-mcp --http --host 127.0.0.1 --port 3002
+```
 ---
 
 ## Architecture
