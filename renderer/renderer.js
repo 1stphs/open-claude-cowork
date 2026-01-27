@@ -173,7 +173,7 @@ function loadAllChats() {
 
 // Update provider UI across all dropdowns
 function updateProviderUI(provider) {
-  const providerLabel = provider === 'claude' ? 'Claude' : 'Opencode';
+  const providerLabel = provider === 'claude' ? 'foxu.ai' : 'Opencode';
   document.querySelectorAll('.provider-selector .provider-label').forEach(l => {
     l.textContent = providerLabel;
   });
@@ -332,7 +332,7 @@ function switchToChat(chatId) {
 }
 
 // Delete a chat
-window.deleteChat = function(chatId, event) {
+window.deleteChat = function (chatId, event) {
   event.stopPropagation();
 
   allChats = allChats.filter(c => c.id !== chatId);
@@ -646,7 +646,7 @@ function renderAttachedFiles(context) {
 }
 
 // Remove attached file
-window.removeAttachedFile = function(index, context) {
+window.removeAttachedFile = function (index, context) {
   attachedFiles.splice(index, 1);
   renderAttachedFiles(context);
 }
@@ -839,7 +839,7 @@ async function handleSendMessage(e) {
       if (timeSinceLastHeartbeat > heartbeatTimeout) {
         console.warn('[Chat] No data received for 5 minutes - connection may be lost');
       }
-    }, 30000); 
+    }, 30000);
 
     try {
       while (true) {
@@ -877,101 +877,101 @@ async function handleSendMessage(e) {
           }
 
           if (line.startsWith('data: ')) {
-          try {
-            const jsonStr = line.slice(6);
-            const data = JSON.parse(jsonStr);
+            try {
+              const jsonStr = line.slice(6);
+              const data = JSON.parse(jsonStr);
 
-            // Debug: log all received events
-            console.log('[Frontend] Received event:', data.type, data.name || '');
+              // Debug: log all received events
+              console.log('[Frontend] Received event:', data.type, data.name || '');
 
-            if (data.type === 'done') {
-              break;
-            } else if (data.type === 'text' && data.content) {
-              if (!hasContent) {
-                const loadingIndicator = contentDiv.querySelector('.loading-indicator');
-                if (loadingIndicator) loadingIndicator.remove();
-              }
-              hasContent = true;
-              receivedStreamingText = true;
-              if (data.isReasoning) {
-                appendToThinking(contentDiv, data.content);
-              } else {
-                appendToContent(contentDiv, data.content);
-              }
-            } else if (data.type === 'tool_use') {
-              const toolName = data.name || data.tool || 'Tool';
-              const toolInput = data.input || {};
-              const apiId = data.id; // API's tool ID
-              const toolCall = addToolCall(toolName, toolInput, 'running');
-              addInlineToolCall(contentDiv, toolName, toolInput, toolCall.id);
-              if (apiId) {
-                pendingToolCalls.set(apiId, toolCall.id);
-              }
+              if (data.type === 'done') {
+                break;
+              } else if (data.type === 'text' && data.content) {
+                if (!hasContent) {
+                  const loadingIndicator = contentDiv.querySelector('.loading-indicator');
+                  if (loadingIndicator) loadingIndicator.remove();
+                }
+                hasContent = true;
+                receivedStreamingText = true;
+                if (data.isReasoning) {
+                  appendToThinking(contentDiv, data.content);
+                } else {
+                  appendToContent(contentDiv, data.content);
+                }
+              } else if (data.type === 'tool_use') {
+                const toolName = data.name || data.tool || 'Tool';
+                const toolInput = data.input || {};
+                const apiId = data.id; // API's tool ID
+                const toolCall = addToolCall(toolName, toolInput, 'running');
+                addInlineToolCall(contentDiv, toolName, toolInput, toolCall.id);
+                if (apiId) {
+                  pendingToolCalls.set(apiId, toolCall.id);
+                }
 
-              if (toolName === 'TodoWrite' && toolInput.todos) {
-                updateTodos(toolInput.todos);
-              }
+                if (toolName === 'TodoWrite' && toolInput.todos) {
+                  updateTodos(toolInput.todos);
+                }
 
-              hasContent = true;
-            } else if (data.type === 'tool_result' || data.type === 'result') {
-              const result = data.result || data.content || data;
-              const apiId = data.tool_use_id;
+                hasContent = true;
+              } else if (data.type === 'tool_result' || data.type === 'result') {
+                const result = data.result || data.content || data;
+                const apiId = data.tool_use_id;
 
-              // Find the matching tool call by API ID
-              const localId = apiId ? pendingToolCalls.get(apiId) : null;
-              if (localId) {
-                updateToolCallResult(localId, result);
-                updateToolCallStatus(localId, 'success');
-                updateInlineToolResult(localId, result);
-                pendingToolCalls.delete(apiId);
-              }
+                // Find the matching tool call by API ID
+                const localId = apiId ? pendingToolCalls.get(apiId) : null;
+                if (localId) {
+                  updateToolCallResult(localId, result);
+                  updateToolCallStatus(localId, 'success');
+                  updateInlineToolResult(localId, result);
+                  pendingToolCalls.delete(apiId);
+                }
 
-              if (!hasContent) {
-                const loadingIndicator = contentDiv.querySelector('.loading-indicator');
-                if (loadingIndicator) loadingIndicator.remove();
-              }
-              hasContent = true;
-            } else if (data.type === 'assistant' && data.message) {
-              if (data.message.content && Array.isArray(data.message.content)) {
-                for (const block of data.message.content) {
-                  if (block.type === 'tool_use') {
-                    const toolName = block.name || 'Tool';
-                    const toolInput = block.input || {};
-                    const apiId = block.id; // API's tool ID
-                    const toolCall = addToolCall(toolName, toolInput, 'running');
-                    addInlineToolCall(contentDiv, toolName, toolInput, toolCall.id);
-                    if (apiId) {
-                      pendingToolCalls.set(apiId, toolCall.id);
-                    }
-                    hasContent = true;
-                  } else if (block.type === 'text' && block.text) {
-                    if (!receivedStreamingText) {
-                      if (!hasContent) {
-                        const loadingIndicator = contentDiv.querySelector('.loading-indicator');
-                        if (loadingIndicator) loadingIndicator.remove();
+                if (!hasContent) {
+                  const loadingIndicator = contentDiv.querySelector('.loading-indicator');
+                  if (loadingIndicator) loadingIndicator.remove();
+                }
+                hasContent = true;
+              } else if (data.type === 'assistant' && data.message) {
+                if (data.message.content && Array.isArray(data.message.content)) {
+                  for (const block of data.message.content) {
+                    if (block.type === 'tool_use') {
+                      const toolName = block.name || 'Tool';
+                      const toolInput = block.input || {};
+                      const apiId = block.id; // API's tool ID
+                      const toolCall = addToolCall(toolName, toolInput, 'running');
+                      addInlineToolCall(contentDiv, toolName, toolInput, toolCall.id);
+                      if (apiId) {
+                        pendingToolCalls.set(apiId, toolCall.id);
                       }
                       hasContent = true;
-                      appendToContent(contentDiv, block.text);
+                    } else if (block.type === 'text' && block.text) {
+                      if (!receivedStreamingText) {
+                        if (!hasContent) {
+                          const loadingIndicator = contentDiv.querySelector('.loading-indicator');
+                          if (loadingIndicator) loadingIndicator.remove();
+                        }
+                        hasContent = true;
+                        appendToContent(contentDiv, block.text);
+                      }
+                    }
+                  }
+                }
+
+                if (data.message.content && Array.isArray(data.message.content)) {
+                  for (const block of data.message.content) {
+                    if (block.type === 'tool_use' && block.name === 'TodoWrite') {
+                      updateTodos(block.input.todos);
                     }
                   }
                 }
               }
 
-              if (data.message.content && Array.isArray(data.message.content)) {
-                for (const block of data.message.content) {
-                  if (block.type === 'tool_use' && block.name === 'TodoWrite') {
-                    updateTodos(block.input.todos);
-                  }
-                }
-              }
+              scrollToBottom();
+            } catch (parseError) {
+              // Silent fail on parse errors
             }
-
-            scrollToBottom();
-          } catch (parseError) {
-            // Silent fail on parse errors
           }
         }
-      }
       }
     } catch (readerError) {
       console.error('[Chat] Reader error:', readerError);
@@ -1125,7 +1125,7 @@ function appendToThinking(contentDiv, content) {
 }
 
 // Start a new chat
-window.startNewChat = function() {
+window.startNewChat = function () {
   // Abort any ongoing request from the previous chat
   if (isWaitingForResponse) {
     window.electronAPI.abortCurrentRequest();
@@ -1305,7 +1305,7 @@ function updateInlineToolResult(toolId, result) {
 }
 
 // Toggle inline tool call expansion
-window.toggleInlineToolCall = function(header) {
+window.toggleInlineToolCall = function (header) {
   const toolDiv = header.closest('.inline-tool-call');
   toolDiv.classList.toggle('expanded');
 };
@@ -1394,7 +1394,7 @@ function updateToolCallResult(toolId, result) {
 }
 
 // Toggle tool call expansion in sidebar
-window.toggleToolCall = function(header) {
+window.toggleToolCall = function (header) {
   const toolDiv = header.closest('.tool-call-item');
   toolDiv.classList.toggle('expanded');
 };
@@ -1425,8 +1425,8 @@ function renderTodos() {
     const statusIcon = todo.status === 'completed'
       ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>'
       : todo.status === 'in_progress'
-      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg>'
-      : '';
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg>'
+        : '';
 
     const displayText = todo.status === 'in_progress' ? (todo.activeForm || todo.content) : todo.content;
 
@@ -1671,7 +1671,7 @@ function showBrowserInSidebar(url, sessionId) {
 }
 
 // Move browser back to inline (in the last assistant message)
-window.moveBrowserToInline = function() {
+window.moveBrowserToInline = function () {
   if (!activeBrowserSession) return;
 
   // Remove from sidebar
@@ -1690,7 +1690,7 @@ window.moveBrowserToInline = function() {
 }
 
 // Close browser session
-window.closeBrowserSession = function() {
+window.closeBrowserSession = function () {
   // Remove inline embed
   const inlineEmbed = document.querySelector('.inline-browser-embed');
   if (inlineEmbed) {
@@ -1708,12 +1708,12 @@ window.closeBrowserSession = function() {
 }
 
 // Open browser in new window
-window.openBrowserInNewWindow = function(url) {
+window.openBrowserInNewWindow = function (url) {
   window.open(url, '_blank', 'width=1200,height=800');
 }
 
 // Toggle browser fullscreen
-window.toggleBrowserFullscreen = function(button) {
+window.toggleBrowserFullscreen = function (button) {
   const embedDiv = button.closest('.inline-browser-embed');
   if (embedDiv) {
     embedDiv.classList.toggle('fullscreen');
@@ -1739,7 +1739,7 @@ window.toggleBrowserFullscreen = function(button) {
 }
 
 // Copy browser URL
-window.copyBrowserUrl = function(url) {
+window.copyBrowserUrl = function (url) {
   navigator.clipboard.writeText(url).then(() => {
     // Show brief feedback
     const btn = document.querySelector('.browser-copy-url');
