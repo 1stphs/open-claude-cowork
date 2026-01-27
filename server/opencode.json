@@ -2,9 +2,9 @@
   "mcp": {
     "composio": {
       "type": "remote",
-      "url": "https://backend.composio.dev/tool_router/trs_LyMgB14Q8frA/mcp",
+      "url": "https://backend.composio.dev/tool_router/trs__Ce9_XYGPUPz/mcp",
       "headers": {
-        "x-api-key": "ak_IrNotiz279_Is0PjbFMm"
+        "x-api-key": "ak_OTFXXHjcQ5daBOmYsg9J"
       }
     }
   }
