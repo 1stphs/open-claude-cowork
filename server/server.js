@@ -128,9 +128,9 @@ app.post('/api/chat', async (req, res) => {
         headers: composioSession.mcp.headers
       },
       // Additional HTTP MCP server
-      local_mcp: {
-        type: 'http',
-        url: 'http://127.0.0.1:3002/mcp',
+      code_mcp: {
+        type: 'sse',
+        url: 'http://127.0.0.1:8931/sse',
         headers: {}
       }
     };

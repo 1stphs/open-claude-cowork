@@ -158,10 +158,10 @@ npm start
 npm start
 ```
 
-**Terminal 3 - MarkitDown MCP**
+**Terminal 3 - E2B MCP**
 ```bash
 uv sync
-uv run markitdown-mcp --http --host 127.0.0.1 --port 3002
+uv run python_server.py
 ```
 ---
 
