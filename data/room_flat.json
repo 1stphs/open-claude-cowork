@@ -1,0 +1,32 @@
+[
+  {
+    "room_name": "5205C",
+    "room_type": "犬猪房",
+    "subtype": "RD",
+    "status": "占用中"
+  },
+  {
+    "room_name": "3210A",
+    "room_type": "犬猪房",
+    "subtype": "RD",
+    "status": "空置"
+  },
+  {
+    "room_name": "3208B",
+    "room_type": "猴房",
+    "subtype": "NG",
+    "status": "占用中"
+  },
+  {
+    "room_name": "5402B",
+    "room_type": "猴房",
+    "subtype": "RD",
+    "status": "占用中"
+  },
+  {
+    "room_name": "5202A",
+    "room_type": "兔房",
+    "subtype": "眼科",
+    "status": "预定开展"
+  }
+]
